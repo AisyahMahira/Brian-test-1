@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuiz Uji Minda Anda!</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align items to the top for better scroll on mobile */
+            min-height: 100vh;
+            color: #333;
+            box-sizing: border-box;
+        }
+        .quiz-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px; /* Max width for mobile display */
+            padding: 25px;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+        .question-section {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .question-text {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #34495e;
+        }
+        .options-container button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            background-color: #ffffff;
+            color: #3498db;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+            text-align: left; /* Align text to the left within the button */
+        }
+        .options-container button:hover {
+            background-color: #3498db;
+            color: #ffffff;
+        }
+        .options-container button.selected {
+            background-color: #2980b9;
+            color: #ffffff;
+            border-color: #2980b9;
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .navigation-buttons button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            flex: 1; /* Make buttons take equal space */
+            margin: 0 5px; /* Add some margin between them */
+        }
+        .navigation-buttons #prevBtn {
+            background-color: #95a5a6;
+            color: #ffffff;
+        }
+        .navigation-buttons #prevBtn:hover {
+            background-color: #7f8c8d;
+        }
+        .navigation-buttons #nextBtn {
+            background-color: #2ecc71;
+            color: #ffffff;
+        }
+        .navigation-buttons #nextBtn:hover {
+            background-color: #27ae60;
+        }
+        .navigation-buttons #submitBtn {
+            background-color: #e74c3c;
+            color: #ffffff;
+            display: none; /* Hidden by default */
+        }
+        .navigation-buttons #submitBtn:hover {
+            background-color: #c0392b;
+        }
+        .result-section {
+            text-align: center;
+            font-size: 1.5em;
+            margin-top: 30px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .result-section button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            background-color: #3498db;
+            color: #ffffff;
+            transition: background-color 0.3s;
+        }
+        .result-section button:hover {
+            background-color: #2980b9;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <h1>Kuiz Uji Minda Anda!</h1>
+
+        <div id="quiz" class="hidden">
+            <div class="question-section">
+                <p id="questionNumber" class="question-text"></p>
+                <p id="questionText" class="question-text"></p>
+            </div>
+            <div id="optionsContainer" class="options-container">
+                </div>
+            <div class="navigation-buttons">
+                <button id="prevBtn">Sebelum</button>
+                <button id="nextBtn">Seterusnya</button>
+                <button id="submitBtn" class="hidden">Hantar Jawapan</button>
+            </div>
+        </div>
+
+        <div id="startScreen">
+            <p style="text-align: center; font-size: 1.1em; margin-bottom: 25px;">Mari uji kepintaran anda dengan soalan-soalan menarik ini!</p>
+            <button style="display: block; width: 100%; padding: 15px; border: none; border-radius: 8px; background-color: #2ecc71; color: white; font-size: 1.2em; cursor: pointer;" onclick="startQuiz()">Mula Kuiz!</button>
+        </div>
+
+        <div id="resultScreen" class="result-section hidden">
+            <p>Anda mendapat <span id="score">0</span> daripada 10 jawapan yang betul!</p>
+            <button onclick="restartQuiz()">Cuba Lagi</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Perkataan manakah yang tidak termasuk dalam kumpulan ini: Epal, Pisang, Lobak Merah, Oren?",
+                options: ["Epal", "Pisang", "Lobak Merah", "Oren"],
+                correct: 2 // Index of 'Lobak Merah'
+            },
+            {
+                question: "Apakah nombor seterusnya dalam urutan ini: 2, 4, 6, 8, ?",
+                options: ["9", "10", "11", "12"],
+                correct: 1 // Index of '10'
+            },
+            {
+                question: "Saya ada bandar, tapi tiada rumah; hutan, tapi tiada pokok; dan air, tapi tiada ikan. Apakah saya?",
+                options: ["Buku", "Peta", "Mimpi", "Langit"],
+                correct: 1 // Index of 'Peta'
+            },
+            {
+                question: "Jika kucing boleh mengejar tikus, apakah yang boleh dikejar oleh anjing?",
+                options: ["Burung", "Bola", "Kucing", "Kereta"],
+                correct: 2 // Index of 'Kucing'
+            },
+            {
+                question: "Bentuk manakah yang berbeza daripada yang lain: segi empat sama, bulatan, segi tiga, segi empat tepat?",
+                options: ["Segi empat sama", "Bulatan", "Segi tiga", "Segi empat tepat"],
+                correct: 1 // Index of 'Bulatan'
+            },
+            {
+                question: "Jika anda menyusun semula huruf 'A, I, R, T, W', apakah jenis cecair yang boleh anda hasilkan?",
+                options: ["Teh", "Air", "Tar", "Rata"],
+                correct: 1 // Index of 'Air'
+            },
+            {
+                question: "Seorang budak lelaki mempunyai bilangan adik-beradik perempuan yang sama dengan adik-beradik lelaki, tetapi setiap adik-beradik perempuan hanya mempunyai separuh bilangan adik-beradik perempuan berbanding adik-beradik lelaki. Berapa ramai budak lelaki dan perempuan dalam keluarga itu?",
+                options: ["3 lelaki, 2 perempuan", "2 lelaki, 2 perempuan", "2 lelaki, 3 perempuan", "3 lelaki, 3 perempuan"],
+                correct: 2 // Index of '2 lelaki, 3 perempuan'
+            },
+            {
+                question: "Bulan manakah yang mempunyai 28 hari?",
+                options: ["Januari", "Februari", "Mac", "Semua bulan"],
+                correct: 3 // Index of 'Semua bulan'
+            },
+            {
+                question: "Jika rumah merah diperbuat daripada bata merah, dan rumah biru diperbuat daripada bata biru, apakah yang diperbuat daripada rumah hijau (greenhouse)?",
+                options: ["Bata hijau", "Kaca", "Kayu", "Plastik"],
+                correct: 1 // Index of 'Kaca'
+            },
+            {
+                question: "Saya adalah haiwan. Saya mempunyai leher yang panjang dan makan daun dari pokok yang tinggi. Apakah saya?",
+                options: ["Gajah", "Zirafah", "Kuda belang", "Singa"],
+                correct: 1 // Index of 'Zirafah'
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = new Array(questions.length).fill(null); // To store user's selected option index
+
+        const quizContainer = document.getElementById('quiz');
+        const startScreen = document.getElementById('startScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        const questionNumberElem = document.getElementById('questionNumber');
+        const questionTextElem = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const scoreElem = document.getElementById('score');
+
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers.fill(null);
+            loadQuestion();
+            updateNavigationButtons();
+        }
+
+        function loadQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            questionNumberElem.textContent = `Soalan ${currentQuestionIndex + 1} dari ${questions.length}`;
+            questionTextElem.textContent = currentQuestion.question;
+            optionsContainer.innerHTML = ''; // Clear previous options
+
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option-button');
+                if (userAnswers[currentQuestionIndex] === index) {
+                    button.classList.add('selected');
+                }
+                button.onclick = () => selectOption(index);
+                optionsContainer.appendChild(button);
+            });
+            updateNavigationButtons();
+        }
+
+        function selectOption(selectedIndex) {
+            userAnswers[currentQuestionIndex] = selectedIndex;
+            // Remove 'selected' class from all buttons and add to the clicked one
+            Array.from(optionsContainer.children).forEach((button, index) => {
+                if (index === selectedIndex) {
+                    button.classList.add('selected');
+                } else {
+                    button.classList.remove('selected');
+                }
+            });
+        }
+
+        function updateNavigationButtons() {
+            prevBtn.style.display = currentQuestionIndex === 0 ? 'none' : 'block';
+            nextBtn.style.display = currentQuestionIndex === questions.length - 1 ? 'none' : 'block';
+            submitBtn.style.display = currentQuestionIndex === questions.length - 1 ? 'block' : 'none';
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            }
+        });
+
+        submitBtn.addEventListener('click', () => {
+            calculateScore();
+            quizContainer.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+        });
+
+        function calculateScore() {
+            score = 0;
+            for (let i = 0; i < questions.length; i++) {
+                if (userAnswers[i] === questions[i].correct) {
+                    score++;
+                }
+            }
+            scoreElem.textContent = score;
+        }
+
+        function restartQuiz() {
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
+
+        // Initialize quiz (starts with start screen)
+        // No need to call loadQuestion() here, startQuiz() handles it.
+    </script>
+
+</body>
+</html>
